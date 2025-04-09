@@ -2,22 +2,43 @@ package com.GB.Application.service;
 
 import com.GB.Application.model.User;
 import com.GB.Application.repository.UserRepository;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 public class UserService {
-    private final UserRepository userRepository;
 
-    public UserService(UserRepository userRepository) {
+    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder; // Injecting the password encoder
+
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    public List<User> allUsers() {
-        List<User> users = new ArrayList<>();
-        userRepository.findAll().forEach(users::add);
-        return users;
+    // Other methods...
+
+    public boolean changePassword(Long userId,  String currentPassword, String newPassword) {
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user  == null) {
+            return false;
+        }
+
+        // Check if current password is correct
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new RuntimeException("Current password is incorrect");
+        }
+
+        // Check if new password is different from current password
+        if (currentPassword.equals(newPassword)) {
+            throw new RuntimeException("New password cannot be the same as the current password");
+        }
+
+        // Update password
+        user.setPassword(passwordEncoder.encode(newPassword));
+        userRepository.save(user);
+        return true;
     }
 }

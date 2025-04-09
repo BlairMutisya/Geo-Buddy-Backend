@@ -7,15 +7,14 @@ import com.GB.Application.model.User;
 import com.GB.Application.responses.LoginResponse;
 import com.GB.Application.service.AuthenticationService;
 import com.GB.Application.service.JwtService;
-import com.GB.Application.repository.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
 
 @RequestMapping("/auth")
 @RestController
 public class AuthenticationController {
     private final JwtService jwtService;
+
     private final AuthenticationService authenticationService;
 
     public AuthenticationController(JwtService jwtService, AuthenticationService authenticationService) {
@@ -30,7 +29,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto) {
+    public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto){
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
         String jwtToken = jwtService.generateToken(authenticatedUser);
         LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
@@ -56,34 +55,4 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
-//    @PostMapping("/forgot-password")
-//    public ResponseEntity<String> forgotPassword(@RequestParam String email) {
-//        User user = userRepository.findByEmail(email);
-//        if (user == null) {
-//            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("User not found");
-//        }
-//
-//        String token = UUID.randomUUID().toString();
-//        PasswordResetToken resetToken = new PasswordResetToken(token, user);
-//        passwordResetTokenRepository.save(resetToken);
-//
-//        emailService.sendResetEmail(user.getEmail(), token); // Implement email service
-//        return ResponseEntity.ok("Reset link sent to your email");
-//    }
-//    @PostMapping("/reset-password")
-//    public ResponseEntity<String> resetPassword(@RequestParam String token, @RequestParam String newPassword) {
-//        PasswordResetToken resetToken = passwordResetTokenRepository.findByToken(token);
-//        if (resetToken == null || resetToken.isExpired()) {
-//            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid or expired token");
-//        }
-//
-//        User user = resetToken.getUser();
-//        user.setPassword(passwordEncoder.encode(newPassword));
-//        userRepository.save(user);
-//
-//        passwordResetTokenRepository.delete(resetToken);
-//        return ResponseEntity.ok("Password successfully reset");
-//    }
-
-
 }

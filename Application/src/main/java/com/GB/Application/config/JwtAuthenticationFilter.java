@@ -51,32 +51,32 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         try {
             final String jwt = authHeader.substring(7);
-            final String userEmail = jwtService.extractUsername(jwt);
-            logger.info("token" + jwt);
+            final String userEmail = jwtService.extractUserEmail(jwt);
+            logger.info("JWT Token extracted: " + jwt);
 
             Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
             if (userEmail != null && authentication == null) {
-                logger.info("email" + userEmail);
                 UserDetails userDetails = this.userDetailsService.loadUserByUsername(userEmail);
-//                UserDetails userDetails = userDetailsService.loadUserByUsername(userEmail);
-                logger.info("user details" + userDetails);
+                logger.info("User details loaded for: " + userEmail);
 
                 if (jwtService.isTokenValid(jwt, userDetails)) {
+                    logger.info("Token is valid for user: " + userEmail);
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                            userDetails,
-                            null,
-                            userDetails.getAuthorities()
+                            userDetails, null, userDetails.getAuthorities()
                     );
-
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken);
+                } else {
+                    logger.warn("Invalid token for user: " + userEmail);
                 }
             }
-
             filterChain.doFilter(request, response);
         } catch (Exception exception) {
+            logger.error("Error in JWT filter: ", exception);
             handlerExceptionResolver.resolveException(request, response, null, exception);
         }
+        logger.info("Leaving JwtAuthenticationFilter...");
+        filterChain.doFilter(request, response);
     }
 }

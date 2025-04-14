@@ -36,31 +36,37 @@ public class AuthenticationService {
 
     // Signup method: User creation with verification code and expiration
     public User signup(RegisterUserDto input) {
+        // Check if user already exists
+        if (userRepository.existsByEmail(input.getEmail())) {
+            throw new RuntimeException("Email already registered");
+        }
+
         User user = new User(
                 input.getUsername(),
                 input.getEmail(),
                 passwordEncoder.encode(input.getPassword()),
-                input.getPhoneNumber()  // Pass phone number here
+                input.getPhoneNumber()
         );
 
-        // If user is not enabled, set the verification code and expiration
-        if (!user.isEnabled()) {
-            user.setVerificationCode(generateVerificationCode());
-            user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
-        }
+        user.setVerificationCode(generateVerificationCode());
+        user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
 
-        sendVerificationEmail(user);  // Send email with the verification code
+        // Save first
+        User savedUser = userRepository.save(user);
 
-        // Save the user after setting the verification code and expiration
-        return userRepository.save(user);
+        // Then send OTP
+        sendVerificationEmail(savedUser);
+
+        return savedUser;
     }
+
 
     // Authenticate method: Handles user login and re-sends verification code if not enabled
     public User authenticate(LoginUserDto input) {
         // Find the user by email
         User user = userRepository.findByEmail(input.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
-
+        System.out.println("pulled user " + user.getUsername());
         // If the user is not enabled (i.e., not verified)
         if (!user.isEnabled()) {
             // Generate and set a new verification code and expiration time
@@ -80,7 +86,7 @@ public class AuthenticationService {
         // If the user is verified, proceed with authentication
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        input.getEmail(),
+                        user.getUsername(),
                         input.getPassword()
                 )
         );
@@ -94,7 +100,6 @@ public class AuthenticationService {
         if (optionalUser.isPresent()) {
             User user = optionalUser.get();
 
-            // ✅ Null check before comparing expiration time
             if (user.getVerificationCodeExpiresAt() == null ||
                     user.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())) {
                 throw new RuntimeException("Verification code has expired. Please request a new one.");

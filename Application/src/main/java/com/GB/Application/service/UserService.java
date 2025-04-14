@@ -20,7 +20,7 @@ public class UserService {
     // Other methods...
 
     public boolean changePassword(Long userId,  String currentPassword, String newPassword) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User not found"));
+        User user = userRepository.findById((long) userId).orElseThrow(() -> new RuntimeException("User not found"));
 
         if (user  == null) {
             return false;

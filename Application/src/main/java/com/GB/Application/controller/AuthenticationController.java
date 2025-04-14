@@ -7,8 +7,11 @@ import com.GB.Application.model.User;
 import com.GB.Application.responses.LoginResponse;
 import com.GB.Application.service.AuthenticationService;
 import com.GB.Application.service.JwtService;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
 
 @RequestMapping("/auth")
 @RestController
@@ -31,16 +34,20 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto){
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
+        System.out.println("generatting token");
         String jwtToken = jwtService.generateToken(authenticatedUser);
-        LoginResponse loginResponse = new LoginResponse(jwtToken, jwtService.getExpirationTime());
-        return ResponseEntity.ok(loginResponse);
+        return !jwtToken.isEmpty() ?
+                ResponseEntity.ok().body(new LoginResponse(jwtToken, "360000")) :
+                ResponseEntity.status(HttpStatusCode.valueOf(401)).body(new LoginResponse("Email/Password is incorrect", "1"));
+//        return ResponseEntity.ok(loginResponse);
     }
 
     @PostMapping("/verify")
     public ResponseEntity<?> verifyUser(@RequestBody VerifyUserDto verifyUserDto) {
         try {
             authenticationService.verifyUser(verifyUserDto);
-            return ResponseEntity.ok("Account verified successfully");
+//            return ResponseEntity.ok("Account verified successfully");
+            return ResponseEntity.ok(Map.of("message", "Account verified successfully"));
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
@@ -51,6 +58,7 @@ public class AuthenticationController {
         try {
             authenticationService.resendVerificationCode(email);
             return ResponseEntity.ok("Verification code sent");
+
         } catch (RuntimeException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }

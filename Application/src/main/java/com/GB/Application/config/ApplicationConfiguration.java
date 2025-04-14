@@ -13,36 +13,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import com.GB.Application.repository.UserRepository;
 
 
-import java.util.List;
-
-//@Configuration
-//public class ApplicationConfiguration {
-//
-//    private final UserDetailsService userDetailsService;
-//
-//    public ApplicationConfiguration(UserDetailsService userDetailsService) {
-//        this.userDetailsService = userDetailsService;
-//    }
-//
-//    @Bean
-//    public PasswordEncoder passwordEncoder() {
-//        return new BCryptPasswordEncoder();
-//    }
-//
-//    @Bean
-//    public DaoAuthenticationProvider authenticationProvider() {
-//        DaoAuthenticationProvider provider = new DaoAuthenticationProvider();
-//        provider.setUserDetailsService(userDetailsService);
-//        provider.setPasswordEncoder(passwordEncoder());
-//        return provider;
-//    }
-//
-//    @Bean
-//    public AuthenticationManager authenticationManager() {
-//        return new ProviderManager(List.of(authenticationProvider()));
-//    }
-//}
-//
 @Configuration
 public class ApplicationConfiguration {
 
@@ -53,11 +23,16 @@ public class ApplicationConfiguration {
         this.userRepository = userRepository;
     }
 
-    @Bean
-    UserDetailsService userDetailsService() {
-        return username -> userRepository.findByEmail(username)
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
-    }
+//    @Bean
+//    UserDetailsService userDetailsService() {
+//        return username -> userRepository.findByEmail(username)
+//                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+//    }
+@Bean
+public UserDetailsService userDetailsService() {
+    return username -> userRepository.findByUsername(username)
+            .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+}
 
     @Bean
     BCryptPasswordEncoder passwordEncoder() {

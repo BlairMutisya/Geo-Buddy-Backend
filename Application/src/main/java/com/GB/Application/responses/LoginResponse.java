@@ -7,11 +7,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class LoginResponse {
-    private String token;
-    private long expiresIn;
+    private String response;
+    private String expiresIn;
 
-    public LoginResponse(String token, long expiresIn) {
-        this.token = token;
+    public LoginResponse(String response, String expiresIn) {
+        this.response = response;
         this.expiresIn = expiresIn;
     }
 }

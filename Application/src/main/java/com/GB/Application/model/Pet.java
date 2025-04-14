@@ -1,7 +1,6 @@
 package com.GB.Application.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -15,4 +14,8 @@ public class Pet extends Tracker {
     private int age;
     private String description;
     private String trackerName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
 }

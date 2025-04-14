@@ -5,6 +5,7 @@ import com.GB.Application.exception.*;
 import com.GB.Application.model.*;
 import com.GB.Application.repository.*;
 import com.GB.Application.service.TrackerService;
+import com.GB.Application.service.CurrentUserService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,17 +22,20 @@ public class TrackerServiceImpl implements TrackerService {
     private final LuggageRepository luggageRepository;
     private final ImeiRepository imeiRepository;
     private final TrackerDataRepository trackerDataRepository;
+    private final CurrentUserService currentUserService;
 
     public TrackerServiceImpl(PetRepository petRepository,
                               ChildRepository childRepository,
                               LuggageRepository luggageRepository,
                               ImeiRepository imeiRepository,
-                              TrackerDataRepository trackerDataRepository) {
+                              TrackerDataRepository trackerDataRepository,
+                              CurrentUserService currentUserService) {
         this.petRepository = petRepository;
         this.childRepository = childRepository;
         this.luggageRepository = luggageRepository;
         this.imeiRepository = imeiRepository;
         this.trackerDataRepository = trackerDataRepository;
+        this.currentUserService = currentUserService;
     }
 
     @Override
@@ -44,6 +48,9 @@ public class TrackerServiceImpl implements TrackerService {
         pet.setAge(petDto.getAge());
         pet.setDescription(petDto.getDescription());
 
+        // Associate the pet with the current user
+        pet.setUser(currentUserService.getCurrentUser());
+
         markImeiAsRegistered(petDto.getImei());
         return petRepository.save(pet);
     }
@@ -54,10 +61,11 @@ public class TrackerServiceImpl implements TrackerService {
 
         Child child = new Child();
         mapCommonTrackerFields(child, childDto);
-//        child.setName(childDto.getName());
         child.setAge(childDto.getAge());
         child.setDescription(childDto.getDescription());
-//        child.setGuardianName(childDto.getGuardianName());
+
+        // Associate the child with the current user
+        child.setUser(currentUserService.getCurrentUser());
 
         markImeiAsRegistered(childDto.getImei());
         return childRepository.save(child);
@@ -72,7 +80,9 @@ public class TrackerServiceImpl implements TrackerService {
         luggage.setLuggageType(luggageDto.getLuggageType());
         luggage.setColor(luggageDto.getColor());
         luggage.setDescription(luggageDto.getDescription());
-//        luggage.setOwnerName(luggageDto.getOwnerName());
+
+        // Associate the luggage with the current user
+        luggage.setUser(currentUserService.getCurrentUser());
 
         markImeiAsRegistered(luggageDto.getImei());
         return luggageRepository.save(luggage);
@@ -87,7 +97,6 @@ public class TrackerServiceImpl implements TrackerService {
         data.setBatteryCapacity(trackerDataDto.getBatteryCapacity());
         data.setStatus(trackerDataDto.getStatus());
         data.setTimestamp(LocalDateTime.now());
-
 
         return trackerDataRepository.save(data);
     }
@@ -118,50 +127,6 @@ public class TrackerServiceImpl implements TrackerService {
                 luggageRepository.existsByImei(imei);
     }
 
-//    @Override
-//    public boolean isImeiValid(String imei) {
-//        return imeiRepository.existsByImei(imei);
-//    }
-
-//    @Override
-//    public Pet updatePetLocation(String imei, Double latitude, Double longitude) {
-//        Pet pet = petRepository.findByImei(imei)
-//                .orElseThrow(() -> new DeviceNotFoundException("Pet tracker not found"));
-//
-//        pet.setLatitude(latitude);
-//        pet.setLongitude(longitude);
-//        pet.setLastUpdated(LocalDateTime.now());
-//
-//        saveTrackerData(pet);
-//        return petRepository.save(pet);
-//    }
-
-//    @Override
-//    public Child updateChildLocation(String imei, Double latitude, Double longitude) {
-//        Child child = childRepository.findByImei(imei)
-//                .orElseThrow(() -> new DeviceNotFoundException("Child tracker not found"));
-//
-//        child.setLatitude(latitude);
-//        child.setLongitude(longitude);
-//        child.setLastUpdated(LocalDateTime.now());
-//
-//        saveTrackerData(child);
-//        return childRepository.save(child);
-//    }
-
-//    @Override
-//    public Luggage updateLuggageLocation(String imei, Double latitude, Double longitude) {
-//        Luggage luggage = luggageRepository.findByImei(imei)
-//                .orElseThrow(() -> new DeviceNotFoundException("Luggage tracker not found"));
-//
-//        luggage.setLatitude(latitude);
-//        luggage.setLongitude(longitude);
-//        luggage.setLastUpdated(LocalDateTime.now());
-//
-//        saveTrackerData(luggage);
-//        return luggageRepository.save(luggage);
-//    }
-
     // Helper methods
     private void validateImeiForRegistration(String imei) {
         if (!imeiRepository.existsByImei(imei)) {
@@ -188,15 +153,4 @@ public class TrackerServiceImpl implements TrackerService {
         tracker.setStatus(dto.getStatus());
         tracker.setLastUpdated(LocalDateTime.now());
     }
-
-//    private void saveTrackerData(Tracker tracker) {
-//        TrackerData data = new TrackerData();
-//        data.setImei(tracker.getImei());
-//        data.setLatitude(tracker.getLatitude());
-//        data.setLongitude(tracker.getLongitude());
-//        data.setBatteryCapacity(tracker.getBatteryCapacity());
-//        data.setStatus(tracker.getStatus());
-//        data.setTimestamp(LocalDateTime.now());
-//        trackerDataRepository.save(data);
-//    }
 }

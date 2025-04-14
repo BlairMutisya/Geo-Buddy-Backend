@@ -32,7 +32,7 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/auth/signup", "/auth/login", "/auth/verify", "/auth/resend", "/api/admin/imei").permitAll()
+                        .requestMatchers("/auth/signup", "/auth/login", "/auth/verify", "/auth/resend", "/admin/imei").permitAll()
                         .requestMatchers("/users/").authenticated()
                         .anyRequest().authenticated()
                 )

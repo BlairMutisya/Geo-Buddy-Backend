@@ -2,9 +2,13 @@ package com.GB.Application.controller;
 
 import com.GB.Application.dto.UserDto;
 import com.GB.Application.model.User;
+import com.GB.Application.service.UserService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -12,6 +16,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/users")
 @RestController
 public class UserController {
+
+    private final UserService userService;
+
+    // Constructor injection
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping("/me")
     public ResponseEntity<UserDto> authenticatedUser() {
@@ -37,5 +48,9 @@ public class UserController {
         return ResponseEntity.ok(dto);
     }
 
-
+    @DeleteMapping("/me")
+    public ResponseEntity<?> deleteAccount(@AuthenticationPrincipal UserDetails userDetails) {
+        userService.deleteUserByUsername(userDetails.getUsername());
+        return ResponseEntity.ok("Your account has been deleted.");
+    }
 }

@@ -22,9 +22,9 @@ public class UserService {
     public boolean changePassword(Long userId,  String currentPassword, String newPassword) {
         User user = userRepository.findById((long) userId).orElseThrow(() -> new RuntimeException("User not found"));
 
-        if (user  == null) {
-            return false;
-        }
+//        if (user  == null) {
+//            return false;
+//        }
 
         // Check if current password is correct
         if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
@@ -41,4 +41,10 @@ public class UserService {
         userRepository.save(user);
         return true;
     }
+    //Delete Account
+    public void deleteUserByUsername(String username) {
+        userRepository.deleteByUsername(username);
+    }
+
+
 }

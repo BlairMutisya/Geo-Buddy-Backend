@@ -34,7 +34,7 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<LoginResponse> authenticate(@RequestBody LoginUserDto loginUserDto){
         User authenticatedUser = authenticationService.authenticate(loginUserDto);
-        System.out.println("generatting token");
+//        System.out.println("generatting token");
         String jwtToken = jwtService.generateToken(authenticatedUser);
         return !jwtToken.isEmpty() ?
                 ResponseEntity.ok().body(new LoginResponse(jwtToken, "360000")) :

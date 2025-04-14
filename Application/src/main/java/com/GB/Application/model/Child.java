@@ -1,7 +1,6 @@
 package com.GB.Application.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
@@ -10,8 +9,14 @@ import lombok.EqualsAndHashCode;
 @Entity
 @Table(name = "children")
 public class Child extends Tracker {
+
     private String name;
     private int age;
     private String description;
     private String trackerName;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id")
+    private User user;
+
 }

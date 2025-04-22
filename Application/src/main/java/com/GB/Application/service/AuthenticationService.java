@@ -95,28 +95,29 @@ public class AuthenticationService {
     }
 
     // Verify method: Mark user as enabled after verifying the verification code
+//
     public void verifyUser(VerifyUserDto input) {
         Optional<User> optionalUser = userRepository.findByEmail(input.getEmail());
-        if (optionalUser.isPresent()) {
-            User user = optionalUser.get();
 
-            if (user.getVerificationCodeExpiresAt() == null ||
-                    user.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())) {
-                throw new RuntimeException("Verification code has expired. Please request a new one.");
-            }
-
-            // Check if verification code matches
-            if (user.getVerificationCode().equals(input.getVerificationCode())) {
-                user.setEnabled(true);  // Enable the user after successful verification
-                // No need to clear verification code and expiration, they will remain as is
-                userRepository.save(user);  // Save the user with updated enabled status
-            } else {
-                throw new RuntimeException("Invalid verification code");
-            }
-        } else {
-            throw new RuntimeException("User not found");
+        if (optionalUser.isEmpty()) {
+            throw new RuntimeException("User not found. Please register or check your email.");
         }
+
+        User user = optionalUser.get();
+
+        if (user.getVerificationCodeExpiresAt() == null ||
+                user.getVerificationCodeExpiresAt().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("Verification code has expired. Please request a new one.");
+        }
+
+        if (!user.getVerificationCode().equals(input.getVerificationCode())) {
+            throw new RuntimeException("Invalid verification code");
+        }
+
+        user.setEnabled(true); // ✅ Activate the account after successful verification
+        userRepository.save(user);
     }
+
 
     // Method to resend verification code if user is not verified
     public void resendVerificationCode(String email) {

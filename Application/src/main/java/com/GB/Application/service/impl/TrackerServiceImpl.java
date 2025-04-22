@@ -90,7 +90,9 @@ public class TrackerServiceImpl implements TrackerService {
 
     @Override
     public TrackerData updateTrackerData(TrackerDataDto trackerDataDto) {
-        TrackerData data = new TrackerData();
+        Optional<TrackerData> existingDataOpt = trackerDataRepository.findByImei(trackerDataDto.getImei());
+
+        TrackerData data = existingDataOpt.orElseGet(TrackerData::new);
         data.setImei(trackerDataDto.getImei());
         data.setLatitude(trackerDataDto.getLatitude());
         data.setLongitude(trackerDataDto.getLongitude());
@@ -98,13 +100,49 @@ public class TrackerServiceImpl implements TrackerService {
         data.setStatus(trackerDataDto.getStatus());
         data.setTimestamp(LocalDateTime.now());
 
+        markImeiAsRegistered(trackerDataDto.getImei());
+
         return trackerDataRepository.save(data);
     }
 
+
     @Override
-    public List<? extends Tracker> getAllTrackers() {
-        throw new UnsupportedOperationException("Use specific endpoints for each tracker type");
+    public List<UnifiedTrackerDto> getAllTrackers() {
+        List<UnifiedTrackerDto> allTrackers = new java.util.ArrayList<>();
+
+        petRepository.findAll().forEach(pet -> allTrackers.add(new UnifiedTrackerDto(
+                pet.getImei(),
+                pet.getTrackerName(),
+                "pet",
+                pet.getLatitude(),
+                pet.getLongitude(),
+                pet.getDescription(),
+                pet.getStatus()
+        )));
+
+        childRepository.findAll().forEach(child -> allTrackers.add(new UnifiedTrackerDto(
+                child.getImei(),
+                child.getTrackerName(),
+                "child",
+                child.getLatitude(),
+                child.getLongitude(),
+                child.getDescription(),
+                child.getStatus() // optional, if null it's fine
+        )));
+
+        luggageRepository.findAll().forEach(luggage -> allTrackers.add(new UnifiedTrackerDto(
+                luggage.getImei(),
+                luggage.getTrackerName(),
+                "luggage",
+                luggage.getLatitude(),
+                luggage.getLongitude(),
+                luggage.getDescription(),
+                luggage.getStatus()
+        )));
+
+        return allTrackers;
     }
+
 
     @Override
     public Tracker getTrackerByImei(String imei) {
@@ -153,4 +191,13 @@ public class TrackerServiceImpl implements TrackerService {
         tracker.setStatus(dto.getStatus());
         tracker.setLastUpdated(LocalDateTime.now());
     }
+    @Override
+    public List<TrackerData> getAllTrackerData() {
+        return trackerDataRepository.findAll();
+    }
+    @Override
+    public Optional<TrackerData> getTrackerDataByImei(String imei) {
+        return trackerDataRepository.findByImei(imei);
+    }
+
 }

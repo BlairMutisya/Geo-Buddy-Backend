@@ -4,6 +4,7 @@ import com.GB.Application.dto.*;
 import com.GB.Application.model.*;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface TrackerService {
     // Pet operations
@@ -20,10 +21,16 @@ public interface TrackerService {
 
     // Common operations
     TrackerData updateTrackerData(TrackerDataDto trackerDataDto);
-    List<? extends Tracker> getAllTrackers();
+//    List<? extends Tracker> getAllTrackers();
+    List<UnifiedTrackerDto> getAllTrackers();
+    List<TrackerData> getAllTrackerData();
+
+
     Tracker getTrackerByImei(String imei);
 
     // IMEI operations
     boolean isImeiRegistered(String imei);
 //    boolean isImeiValid(String imei);
+     Optional<TrackerData> getTrackerDataByImei(String imei);
+
 }

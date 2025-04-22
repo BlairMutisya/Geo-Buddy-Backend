@@ -1,6 +1,7 @@
 package com.GB.Application.controller;
 
 import com.GB.Application.dto.*;
+import com.GB.Application.model.TrackerData;
 import com.GB.Application.service.TrackerService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -21,7 +22,7 @@ public class TrackerController {
         this.trackerService = trackerService;
     }
 
-//    @GetMapping("/pet")
+
     @PostMapping("/pet")
     @Operation(summary = "Register a new pet tracker")
     public ResponseEntity<?> registerPet(@Valid @RequestBody PetDto petDto) {
@@ -60,4 +61,27 @@ public class TrackerController {
     public ResponseEntity<?> updateLocation(@Valid @RequestBody TrackerDataDto trackerDataDto) {
         return ResponseEntity.ok(trackerService.updateTrackerData(trackerDataDto));
     }
+
+    // POST tracker data (already exists, but you can rename it if needed)
+    @PostMapping("/data")
+    @Operation(summary = "Receive tracker data from devices")
+    public ResponseEntity<?> receiveTrackerData(@Valid @RequestBody TrackerDataDto trackerDataDto) {
+        return ResponseEntity.ok(trackerService.updateTrackerData(trackerDataDto));
+    }
+
+    // GET all tracker data
+    @GetMapping("/data")
+    @Operation(summary = "Get all tracker data records")
+    public ResponseEntity<List<TrackerData>> getAllTrackerData() {
+        return ResponseEntity.ok(trackerService.getAllTrackerData());
+    }
+    @GetMapping("/data/{imei}")
+    @Operation(summary = "Get tracker data by IMEI")
+    public ResponseEntity<?> getTrackerDataByImei(@PathVariable String imei) {
+        return trackerService.getTrackerDataByImei(imei)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+
 }

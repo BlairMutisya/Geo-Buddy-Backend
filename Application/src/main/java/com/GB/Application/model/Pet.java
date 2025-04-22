@@ -1,5 +1,6 @@
 package com.GB.Application.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -13,9 +14,10 @@ public class Pet extends Tracker {
     private String breed;
     private int age;
     private String description;
-    private String trackerName;
+//    private String trackerName;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
+    @JsonIgnore
     private User user;
 }

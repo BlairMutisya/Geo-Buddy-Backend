@@ -34,6 +34,7 @@ public class SecurityConfiguration {
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/auth/signup", "/auth/login", "/auth/verify", "/auth/resend", "/admin/imei").permitAll()
                         .requestMatchers("/users/").authenticated()
+//                        .requestMatchers("/trackers").permitAll()
                         .anyRequest().authenticated()
                 )
                 .sessionManagement(session -> session
@@ -48,11 +49,11 @@ public class SecurityConfiguration {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://10.20.31.201", "http://localhost:8080"));
+        configuration.setAllowedOrigins(List.of("http://10.20.31.201","http://172.20.10.2", "http://localhost:3000"));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE"));
         configuration.setAllowedHeaders(List.of("Authorization", "Content-Type"));
         configuration.setAllowCredentials(true);
-        configuration.setExposedHeaders(List.of("Authorization")); // Expose the Authorization header to client
+//        configuration.setExposedHeaders(List.of("Authorization")); // Expose the Authorization header to client
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

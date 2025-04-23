@@ -4,8 +4,11 @@ import com.GB.Application.dto.ImeiDto;
 import com.GB.Application.dto.UserDto;
 import com.GB.Application.model.*;
 import com.GB.Application.service.AdminService;
+import com.GB.Application.service.TrackerService;
+import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import com.GB.Application.service.UserService;
 
@@ -14,16 +17,19 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/admin")
-//@PreAuthorize("hasRole('ADMIN')")
+@PreAuthorize("hasRole('ADMIN')")
 @Tag(name = "Admin API", description = "Administrative operations")
 public class AdminController {
 
     private final AdminService adminService;
     private final UserService userService;
 
-    public AdminController(AdminService adminService, UserService userService) {
+    private final TrackerService trackerService;
+
+    public AdminController(AdminService adminService, UserService userService, TrackerService trackerService) {
         this.adminService = adminService;
         this.userService = userService;
+        this.trackerService = trackerService;
     }
 
     // ===== PETS =====
@@ -131,4 +137,11 @@ public class AdminController {
         userService.deleteUserByUsername(username);
         return ResponseEntity.ok("User '" + username + "' has been deleted.");
     }
+    @GetMapping("/all-trackers")
+    @Operation(summary = "Get all trackers (Admin only)")
+//    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<?>> getAllTrackers() {
+        return ResponseEntity.ok(trackerService.getAllTrackers());
+    }
+
 }

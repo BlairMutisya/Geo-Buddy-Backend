@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -107,41 +108,97 @@ public class TrackerServiceImpl implements TrackerService {
 
 
     @Override
+    public List<UnifiedTrackerDto> getMyTrackers() {
+        User currentUser = currentUserService.getCurrentUser();
+        List<UnifiedTrackerDto> userTrackers = new ArrayList<>();
+
+        petRepository.findByUser(currentUser).forEach(pet -> {
+            UnifiedTrackerDto dto = mapPetToDto(pet);
+            userTrackers.add(dto);
+        });
+
+        childRepository.findByUser(currentUser).forEach(child -> {
+            UnifiedTrackerDto dto = mapChildToDto(child);
+            userTrackers.add(dto);
+        });
+
+        luggageRepository.findByUser(currentUser).forEach(luggage -> {
+            UnifiedTrackerDto dto = mapLuggageToDto(luggage);
+            userTrackers.add(dto);
+        });
+
+        return userTrackers;
+    }
+    @Override
     public List<UnifiedTrackerDto> getAllTrackers() {
-        List<UnifiedTrackerDto> allTrackers = new java.util.ArrayList<>();
+        List<UnifiedTrackerDto> allTrackers = new ArrayList<>();
 
-        petRepository.findAll().forEach(pet -> allTrackers.add(new UnifiedTrackerDto(
-                pet.getImei(),
-                pet.getTrackerName(),
-                "pet",
-                pet.getLatitude(),
-                pet.getLongitude(),
-                pet.getDescription(),
-                pet.getStatus()
-        )));
+        petRepository.findAll().forEach(pet -> {
+            UnifiedTrackerDto dto = mapPetToDto(pet);
+            allTrackers.add(dto);
+        });
 
-        childRepository.findAll().forEach(child -> allTrackers.add(new UnifiedTrackerDto(
-                child.getImei(),
-                child.getTrackerName(),
-                "child",
-                child.getLatitude(),
-                child.getLongitude(),
-                child.getDescription(),
-                child.getStatus() // optional, if null it's fine
-        )));
+        childRepository.findAll().forEach(child -> {
+            UnifiedTrackerDto dto = mapChildToDto(child);
+            allTrackers.add(dto);
+        });
 
-        luggageRepository.findAll().forEach(luggage -> allTrackers.add(new UnifiedTrackerDto(
-                luggage.getImei(),
-                luggage.getTrackerName(),
-                "luggage",
-                luggage.getLatitude(),
-                luggage.getLongitude(),
-                luggage.getDescription(),
-                luggage.getStatus()
-        )));
+        luggageRepository.findAll().forEach(luggage -> {
+            UnifiedTrackerDto dto = mapLuggageToDto(luggage);
+            allTrackers.add(dto);
+        });
 
         return allTrackers;
     }
+
+    private UnifiedTrackerDto mapPetToDto(Pet pet) {
+        UnifiedTrackerDto dto = new UnifiedTrackerDto();
+        dto.setImei(pet.getImei());
+        dto.setTrackerName(pet.getTrackerName());
+        dto.setType("pet");
+        dto.setLatitude(pet.getLatitude());
+        dto.setLongitude(pet.getLongitude());
+        dto.setDescription(pet.getDescription());
+        dto.setStatus(pet.getStatus());
+        dto.setBatteryCapacity(pet.getBatteryCapacity());
+        dto.setTimestamp(pet.getLastUpdated());
+        dto.setAge(pet.getAge());
+        dto.setBreed(pet.getBreed());
+        return dto;
+    }
+
+    private UnifiedTrackerDto mapChildToDto(Child child) {
+        UnifiedTrackerDto dto = new UnifiedTrackerDto();
+        dto.setImei(child.getImei());
+        dto.setTrackerName(child.getTrackerName());
+        dto.setType("child");
+        dto.setLatitude(child.getLatitude());
+        dto.setLongitude(child.getLongitude());
+        dto.setDescription(child.getDescription());
+        dto.setStatus(child.getStatus());
+        dto.setBatteryCapacity(child.getBatteryCapacity());
+        dto.setTimestamp(child.getLastUpdated());
+        dto.setAge(child.getAge());
+        return dto;
+    }
+
+    private UnifiedTrackerDto mapLuggageToDto(Luggage luggage) {
+        UnifiedTrackerDto dto = new UnifiedTrackerDto();
+        dto.setImei(luggage.getImei());
+        dto.setTrackerName(luggage.getTrackerName());
+        dto.setType("luggage");
+        dto.setLatitude(luggage.getLatitude());
+        dto.setLongitude(luggage.getLongitude());
+        dto.setDescription(luggage.getDescription());
+        dto.setStatus(luggage.getStatus());
+        dto.setBatteryCapacity(luggage.getBatteryCapacity());
+        dto.setTimestamp(luggage.getLastUpdated());
+        dto.setLuggageType(luggage.getLuggageType());
+        dto.setColor(luggage.getColor());
+        return dto;
+    }
+
+
 
 
     @Override

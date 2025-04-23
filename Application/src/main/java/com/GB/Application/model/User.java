@@ -18,9 +18,12 @@ import java.util.List;
 @Setter
 public class User implements UserDetails {
 
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
+    @Enumerated(EnumType.STRING)
+    private Role role;
 
     @Column(unique = true, nullable = false)
     private String username;
@@ -53,8 +56,9 @@ public class User implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(() -> "ROLE_" + this.role.name());
     }
+
 
 
     @Override

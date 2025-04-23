@@ -32,5 +32,8 @@ public interface TrackerService {
     boolean isImeiRegistered(String imei);
 //    boolean isImeiValid(String imei);
      Optional<TrackerData> getTrackerDataByImei(String imei);
+     List<UnifiedTrackerDto> getMyTrackers();
+//    List<UnifiedTrackerDto> getAllTrackers(); // for admins
+//    List<UnifiedTrackerDto> getMyTrackers();  // for current user
 
 }

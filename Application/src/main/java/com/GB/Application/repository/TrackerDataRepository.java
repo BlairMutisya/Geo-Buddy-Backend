@@ -12,8 +12,6 @@ import java.util.Optional;
 @Repository
 public interface TrackerDataRepository extends JpaRepository<TrackerData, Long> {
 
-    // Find all data for a specific IMEI
-//    List<TrackerData> findByImei(String imei);
 
     // Find latest data for a specific IMEI
     @Query("SELECT t FROM TrackerData t WHERE t.imei = ?1 ORDER BY t.timestamp DESC")

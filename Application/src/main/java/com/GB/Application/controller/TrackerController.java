@@ -44,13 +44,6 @@ public class TrackerController {
         return ResponseEntity.ok(trackerService.registerLuggage(luggageDto));
     }
 
-//    @GetMapping("/all-trackers")
-//    @Operation(summary = "Get all trackers (Admin only)")
-//    @PreAuthorize("hasRole('ADMIN')")
-//    public ResponseEntity<List<?>> getAllTrackers() {
-//        return ResponseEntity.ok(trackerService.getAllTrackers());
-//    }
-
     @GetMapping("/my")
     @Operation(summary = "Get trackers registered by the current user")
     @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")

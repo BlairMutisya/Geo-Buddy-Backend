@@ -9,6 +9,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
+import java.util.Map;
+
 @RestController
 @RequestMapping("/users")
 public class PasswordController {
@@ -22,28 +25,32 @@ public class PasswordController {
     // Password change endpoint
     @PutMapping("/me/password")
     @PreAuthorize("isAuthenticated()")
-    public ResponseEntity<String> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
+    public ResponseEntity<?> changePassword(@RequestBody ChangePasswordDto changePasswordDto) {
         // Get the authenticated user ID from the Security Context
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         Long userId = ((User) authentication.getPrincipal()).getId();
-//        int userFound = (Integer) authentication.getPrincipal();
-//
-////        if (userFound) {
-////            return ResponseEntity.status(400).body("Failed to change password");
-////        }
 
         try {
-            // Call the service method to change the password
-            boolean isPasswordChanged = userService.changePassword(userId, changePasswordDto.getCurrentPassword(), changePasswordDto.getNewPassword());
+            boolean isPasswordChanged = userService.changePassword(
+                    userId,
+                    changePasswordDto.getCurrentPassword(),
+                    changePasswordDto.getNewPassword()
+            );
+
+            Map<String, String> response = new HashMap<>();
 
             if (isPasswordChanged) {
-                return ResponseEntity.ok("Password changed successfully");
+                response.put("message", "Password changed successfully");
+                return ResponseEntity.ok(response);
             } else {
-                return ResponseEntity.status(400).body("Failed to change password");
+                response.put("message", "Failed to change password");
+                return ResponseEntity.status(400).body(response);
             }
-        } catch (RuntimeException e) {
-            // Handle the error
-            return ResponseEntity.badRequest().body(e.getMessage());
+        } catch (Exception e) {
+            Map<String, String> errorResponse = new HashMap<>();
+            errorResponse.put("message", "An unexpected error occurred");
+            return ResponseEntity.status(500).body(errorResponse);
         }
     }
+
 }

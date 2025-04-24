@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @RequestMapping("/users")
@@ -50,8 +52,8 @@ public class UserController {
                 currentUser.getPhoneNumber()
 
         );
-        String trace = UUID.randomUUID().toString();
-        System.out.println("This user has been called: " + trace);
+//        String trace = UUID.randomUUID().toString();
+//        System.out.println("This user has been called: " + trace);
         return ResponseEntity.ok(dto);
     }
 
@@ -59,6 +61,11 @@ public class UserController {
     @DeleteMapping("/me")
     public ResponseEntity<?> deleteAccount(@AuthenticationPrincipal UserDetails userDetails) {
         userService.deleteUserByUsername(userDetails.getUsername());
-        return ResponseEntity.ok("Your account has been deleted.");
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Your account has been deleted.");
+
+        return ResponseEntity.ok(response);
     }
+
 }

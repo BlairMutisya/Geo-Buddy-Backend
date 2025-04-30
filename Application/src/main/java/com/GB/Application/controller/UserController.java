@@ -3,69 +3,66 @@ package com.GB.Application.controller;
 import com.GB.Application.dto.UserDto;
 import com.GB.Application.model.User;
 import com.GB.Application.service.UserService;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.transaction.Transactional;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.UUID;
-
-@RequestMapping("/users")
 @RestController
+@RequestMapping("/users")
+@Tag(name = "User API", description = "Operations related to authenticated users")
 public class UserController {
 
     private final UserService userService;
 
-    // Constructor injection
     public UserController(UserService userService) {
         this.userService = userService;
     }
 
     @GetMapping("/me")
+    @Operation(
+            summary = "Get the currently authenticated user's profile",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "User profile retrieved successfully"),
+                    @ApiResponse(responseCode = "401", description = "User not authenticated")
+            }
+    )
     public ResponseEntity<UserDto> authenticatedUser() {
-
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        if (authentication == null) {
-            return ResponseEntity.status(401).body(null);  // Not authenticated
+        if (authentication == null || !(authentication.getPrincipal() instanceof User)) {
+            return ResponseEntity.status(401).build();
         }
 
         User currentUser = (User) authentication.getPrincipal();
-
-
-        if (currentUser == null) {
-            return ResponseEntity.status(401).body(null);  // No user found in context
-        }
 
         UserDto dto = new UserDto(
                 currentUser.getId(),
                 currentUser.getUsername(),
                 currentUser.getEmail(),
                 currentUser.getPhoneNumber()
-
         );
-//        String trace = UUID.randomUUID().toString();
-//        System.out.println("This user has been called: " + trace);
+
         return ResponseEntity.ok(dto);
     }
 
     @Transactional
     @DeleteMapping("/me")
-    public ResponseEntity<?> deleteAccount(@AuthenticationPrincipal UserDetails userDetails) {
+    @Operation(
+            summary = "Delete the currently authenticated user's account",
+            responses = {
+                    @ApiResponse(responseCode = "200", description = "Account deleted successfully"),
+                    @ApiResponse(responseCode = "401", description = "User not authenticated")
+            }
+    )
+    public ResponseEntity<Void> deleteAccount(@AuthenticationPrincipal UserDetails userDetails) {
         userService.deleteUserByUsername(userDetails.getUsername());
-
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Your account has been deleted.");
-
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok().build();
     }
-
 }

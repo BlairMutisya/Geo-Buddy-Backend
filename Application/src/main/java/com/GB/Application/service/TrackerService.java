@@ -33,7 +33,6 @@ public interface TrackerService {
 //    boolean isImeiValid(String imei);
      Optional<TrackerData> getTrackerDataByImei(String imei);
      List<UnifiedTrackerDto> getMyTrackers();
-//    List<UnifiedTrackerDto> getAllTrackers(); // for admins
-//    List<UnifiedTrackerDto> getMyTrackers();  // for current user
+
 
 }

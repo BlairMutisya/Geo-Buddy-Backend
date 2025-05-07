@@ -22,13 +22,5 @@ public interface ImeiRepository extends JpaRepository<Imei, Long> {
     // Count registered devices
     long countByRegistered(boolean registered);
 
-    // Find IMEIs that are not yet registered to any device
-//    @Query("SELECT i FROM Imei i WHERE i.registered = false")
-//    List<Imei> findAvailableImeis();
-//
-//    // Bulk update registration status
-//    @Modifying
-//    @Query("UPDATE Imei i SET i.registered = :registered WHERE i.imei IN :imeis")
-//    int updateRegistrationStatus(@Param("registered") boolean registered,
-//                                 @Param("imeis") List<String> imeis);
+
 }

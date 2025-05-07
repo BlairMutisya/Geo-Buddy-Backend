@@ -14,9 +14,7 @@ public interface AdminService {
 
     // ----- POST / CREATE -----
     Imei addImei(String imei);
-//    Pet addPet(Pet pet);
-//    Child addChild(Child child);
-//    Luggage addLuggage(Luggage luggage);
+
 
     // ----- PUT / UPDATE -----
     Pet updatePet(Long id, Pet updatedPet);

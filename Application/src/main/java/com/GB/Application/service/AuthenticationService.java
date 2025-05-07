@@ -36,30 +36,7 @@ public class AuthenticationService {
     }
 
     // Signup method: User creation with verification code and expiration
-//    public User signup(RegisterUserDto input) {
-//        // Check if user already exists
-//        if (userRepository.existsByEmail(input.getEmail())) {
-//            throw new RuntimeException("Email already registered");
-//        }
-//
-//        User user = new User(
-//                input.getUsername(),
-//                input.getEmail(),
-//                passwordEncoder.encode(input.getPassword()),
-//                input.getPhoneNumber()
-//        );
-//
-//        user.setVerificationCode(generateVerificationCode());
-//        user.setVerificationCodeExpiresAt(LocalDateTime.now().plusMinutes(15));
-//
-//        // Save first
-//        User savedUser = userRepository.save(user);
-//
-//        // Then send OTP
-//        sendVerificationEmail(savedUser);
-//
-//        return savedUser;
-//    }
+
     public User signup(RegisterUserDto input) {
         // Check if user already exists
         if (userRepository.existsByEmail(input.getEmail())) {
@@ -73,7 +50,7 @@ public class AuthenticationService {
                 input.getPhoneNumber()
         );
 
-        // ✅ Set default role here
+        //  Set default role
         user.setRole(Role.USER);
 
         // Verification setup

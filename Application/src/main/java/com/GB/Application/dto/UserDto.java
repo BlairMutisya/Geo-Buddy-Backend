@@ -14,8 +14,6 @@ public class UserDto {
     private String username;
     private String email;
     private String phoneNumber;
-//    private List<PetDto> pets;
-//    private List<ChildDto> children;
-//    private List<LuggageDto> luggages;
+
 }
 
